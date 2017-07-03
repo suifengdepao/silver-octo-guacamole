@@ -18,18 +18,20 @@
 </table>
 
 <?php
-    $js=<<<JS
+    $js=<<<EOT
         $(".toggle_cate").click(function () {
+            var show = $(this).hasClass("glyphicon-chevron-up");
+            $(this).toggleClass("glyphicon-chevron-down");
+            $(this).toggleClass("glyphicon-chevron-up");
             var tr=$(this).closest('tr');
             var tree=parseInt(tr.attr('date-tree'));
             var lft=parseInt(tr.attr('date-lft'));
             var rgt=parseInt(tr.attr('date-rgt'));
             $(".cate tr").each(function() {
                if(parseInt($(this).attr('date-tree'))==tree && parseInt($(this).attr('date-lft'))>lft && parseInt($(this).attr('date-rgt'))<rgt){
-                   $(this).hide();
-                   console.log(this);
+                   show?$(this).fadeIn():$(this).fadeOut();
                }
             });
         });
-JS;
+EOT;
     $this->registerJs($js);

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\RbacFilter;
 use backend\models\Brand;
 use backend\models\Goods;
 use backend\models\GoodsCategory;
@@ -16,6 +17,14 @@ use yii\web\NotFoundHttpException;
 
 class GoodsController extends \yii\web\Controller
 {
+    //过滤器
+    public function behaviors(){
+        return [
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
+    }
     //显示数据
     public function actionIndex()
     {
@@ -62,6 +71,7 @@ class GoodsController extends \yii\web\Controller
             $id = $mould->attributes['id'];//商品表上一次添加数据的id
             $intro->goods_id=$id;
             $intro->save();
+            \Yii::$app->session->setFlash('success','添加成功');
             return $this->redirect(['goods/index']);
         }
         return $this->render('add',['mould'=>$mould,'cate'=>$cate,'brand'=>$brand,'intro'=>$intro]);
@@ -74,12 +84,13 @@ class GoodsController extends \yii\web\Controller
         $brand=ArrayHelper::map(Brand::find()->all(),'id','name');
         $request=new Request();
         if($mould->load($request->post()) && $mould->validate()){
-            $goods_id = $mould->attributes['id']+1;//商品表上一次添加数据的id
-            $date=date('Ymd').str_pad($goods_id,5,"0",STR_PAD_LEFT);//生成货号
+            $date=date('Ymd').str_pad($id,5,"0",STR_PAD_LEFT);//生成货号
             $mould->sn=$date;
-            $mould->save();
-            $intro->goods_id=$goods_id;
-            $intro->save();
+            $mould->save(false);
+            $intro->goods_id=$id;
+            $intro->save(false);
+            \Yii::$app->session->setFlash('success','修改成功');
+            return $this->redirect(['goods/index']);
         }
         return $this->render('add',['mould'=>$mould,'cate'=>$cate,'brand'=>$brand,'intro'=>$intro]);
     }
@@ -88,6 +99,8 @@ class GoodsController extends \yii\web\Controller
         $mould=Goods::findOne(['id'=>$id]);
         $mould->status=0;
         $mould->save();
+        \Yii::$app->session->setFlash('success','删除成功');
+        return $this->redirect(['goods/index']);
     }
     //详情
     public function actionContent($id){

@@ -4,10 +4,20 @@ namespace backend\controllers;
 
 use backend\models\LoginForm;
 use backend\models\User;
+use yii\web\NotFoundHttpException;
 use yii\web\Request;
+use backend\components\RbacFilter;
 
 class UserController extends \yii\web\Controller
 {
+    /*//过滤器
+    public function behaviors(){
+        return [
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
+    }*/
     public function actionIndex()
     {
 //        var_dump(\Yii::$app->user->identity);exit;
@@ -18,26 +28,46 @@ class UserController extends \yii\web\Controller
     public function actionAdd(){
         $user=new User();//实例化模型
         $request=new Request();
+
         //判断是否提交了数据，并且验证数据
         if($user->load($request->post()) && $user->validate()){
+            if(User::findOne(['username'=>$user->username])){
+                throw new NotFoundHttpException('此名字已存在');
+            }
             $user->password_hash = \Yii::$app->getSecurity()->generatePasswordHash($user->password_hash);//密码加密
             $user->auth_key = \Yii::$app->getSecurity()->generateRandomString();
             $user->created_at=time();
             $user->save(false);
+            $userid=$user->attributes['id'];
+            foreach($user->role as $role){
+                $role=\Yii::$app->authManager->getRole($role);
+                if($role) \Yii::$app->authManager->assign($role,$userid);
+            }
             //提示
             \Yii::$app->session->setFlash('success','用户添加成功');
             return $this->redirect(['user/index']);
         }
-        //echo 333;exit;
         return $this->render('add',['user'=>$user]);
     }
     //修改管理员
     public function actionEdit($id){
         $user=User::findOne(['id'=>$id]);
+        $roles=\Yii::$app->authManager->getAssignments($id);
+        foreach ($roles as $role){
+            $user->role[]=$role->roleName;
+        }
+
         $request=new Request();
         //判断是否提交了数据，并且验证数据
         if($user->load($request->post()) && $user->validate()){
+            $user->password_hash = \Yii::$app->getSecurity()->generatePasswordHash($user->password_hash);//密码加密
+            $user->updated_at=time();
             $user->save(false);
+            \Yii::$app->authManager->revokeAll($id);//删除管理员的角色
+            foreach($user->role as $role){
+                $role=\Yii::$app->authManager->getRole($role);
+                if($role) \Yii::$app->authManager->assign($role,$id);
+            }
             //提示
             \Yii::$app->session->setFlash('success','用户修改成功');
             return $this->redirect(['user/index']);
@@ -47,6 +77,7 @@ class UserController extends \yii\web\Controller
     //删除管理员
     public function actionDel($id){
         User::deleteAll(['id'=>$id]);
+        \Yii::$app->authManager->revokeAll($id);//删除管理员的角色
         return $this->redirect(['user/index']);
     }
     //登陆
@@ -59,16 +90,12 @@ class UserController extends \yii\web\Controller
             $user->login_ip=\Yii::$app->request->userIP;
             $user->save(false);
             \Yii::$app->session->setFlash('success','登陆成功');
-            return $this->redirect(['user/index']);
+            return $this->redirect(['goods/index']);
         }
         return $this->render('login',['login'=>$login]);
     }
     //注销
     public function actionOut(){
-//        $cookie = \Yii::$app->request->cookies;
-//        if($cookie->has($this->username)){
-//            $cookie->remove($this->username);
-//        }
         \Yii::$app->user->logout();
         \Yii::$app->session->setFlash('success','注销成功');
         return $this->redirect(['user/index']);

@@ -30,7 +30,7 @@ EOF
             //将上传成功的图片地址写入logo字段
 //            $("#goods-logo").val(data.fileUrl);
             var html='<tr data-id="'+data.goods_id+'" id="gallery_'+data.goods_id+'">';
-            html += '<td><img src="'+data.fileUrl+'" /></td>';
+            html += '<td><img src="'+data.fileUrl+'" width="60"/></td>';
             html += '<td><button type="button" class="btn btn-danger del_btn">删除</button></td>';
             html += '</tr>';
             $("table").append(html);

@@ -4,6 +4,7 @@ namespace backend\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 
 /**
@@ -23,6 +24,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
     public $tr_password;//确认密码字段
     public $code;//验证码
+    public $role=[];//角色
     /**
      * @inheritdoc
      */
@@ -46,6 +48,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             [['password_reset_token'], 'unique'],
             ['tr_password','compare','compareAttribute'=>'password_hash'],
             ['code','captcha','captchaAction'=>'user/captcha'],
+            ['role','safe'],
         ];
     }
 
@@ -59,7 +62,29 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'password_hash' => '密码',
             'status' => '状态',
             'tr_password'=>'确认密码',
+            'role'=>'角色',
         ];
+    }
+    /*//添加用户的方法
+    public function adduser(){
+//        var_dump($this->role);exit;
+        if(User::findOne(['username'=>$this->username])){
+            $this->addError('username','此名字已存在');
+        }
+        $this->password_hash = \Yii::$app->getSecurity()->generatePasswordHash($this->password_hash);//密码加密
+        $this->auth_key = \Yii::$app->getSecurity()->generateRandomString();
+        $this->created_at=time();
+        $this->save();
+        $userid=$this->attributes['id'];
+        foreach($this->role as $role){
+            $role=\Yii::$app->authManager->getRole($role);
+            if($role) \Yii::$app->authManager->assign($role,$userid);
+        }
+    }*/
+    //获取所有角色的方法
+    public static function getroles(){
+        $authmanager=\Yii::$app->authManager->getRoles();
+        return ArrayHelper::map($authmanager,'name','description');
     }
     //静态方法创建时间
     public function behaviros(){

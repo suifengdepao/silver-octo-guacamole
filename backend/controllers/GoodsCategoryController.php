@@ -5,8 +5,17 @@ use backend\models\GoodsCategory;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Request;
+use backend\components\RbacFilter;
 
 class GoodsCategoryController extends Controller{
+    //过滤器
+    public function behaviors(){
+        return [
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
+    }
     public function actionIndex(){
         $gui=GoodsCategory::find()->orderBy('tree,lft')->all();
         return $this->render('index',['gui'=>$gui]);
@@ -36,9 +45,11 @@ class GoodsCategoryController extends Controller{
     }
     public function actionEdit($id){
         $mould=GoodsCategory::findOne(['id'=>$id]);
+        $parent=$mould->parent_id;
         $request=new Request();
         if($request->isPost) {
             $mould->load($request->post());
+//            var_dump($mould->parent_id);exit;
             if ($mould->validate()) {
                 //
                 if ($mould->parent_id) {
@@ -46,10 +57,15 @@ class GoodsCategoryController extends Controller{
                     $parent = GoodsCategory::findOne(['id' => $mould->parent_id]);
                     $mould->prependTo($parent);
                 } else {
-                    //添加一级分类
-                    $mould->makeRoot();
+                    if($parent==0){
+                        $mould->save();
+                    }else{
+                        //添加一级分类
+                        $mould->makeRoot();
+                    }
+
                 }
-                \Yii::$app->session->setFlash('success', '添加成功');
+                \Yii::$app->session->setFlash('success', '修改成功');
                 return $this->redirect(['goods-category/index']);
             }
         }

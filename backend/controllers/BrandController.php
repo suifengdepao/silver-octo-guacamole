@@ -7,9 +7,18 @@ use yii\web\Request;
 use yii\web\UploadedFile;
 use xj\uploadify\UploadAction;
 use crazyfd\qiniu\Qiniu;;
+use backend\components\RbacFilter;
 
 class BrandController extends \yii\web\Controller
 {
+    //过滤器
+    public function behaviors(){
+        return [
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+            ]
+        ];
+    }
     //将数据查询出来显示到页面
     public function actionIndex()
     {

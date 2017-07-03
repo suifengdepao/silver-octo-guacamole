@@ -17,7 +17,11 @@
         <td><?php if($in->logo){echo "<img src='$in->logo'width='60'/>";} ?></td>
         <td><?=$in->sort?></td>
         <td><?=\backend\models\Brand::$status[$in->status]?></td>
-        <td><?=\yii\bootstrap\Html::a('修改',['brand/edit','id'=>$in->id],['class'=>'btn btn-warning btn-xs'])?><?=\yii\bootstrap\Html::a('删除',['brand/del','id'=>$in->id],['class'=>'btn btn-warning btn-xs'])?></td>
+        <td><?php if(\Yii::$app->user->can('brand/edit')){
+            echo \yii\bootstrap\Html::a('修改',['brand/edit','id'=>$in->id],['class'=>'btn btn-warning btn-xs']);}
+            if(\Yii::$app->user->can('brand/del')){
+        echo \yii\bootstrap\Html::a('删除',['brand/del','id'=>$in->id],['class'=>'btn btn-warning btn-xs']);}
+        ?></td>
     </tr>
     <?php endforeach;?>
 </table>

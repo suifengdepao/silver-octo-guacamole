@@ -38,7 +38,7 @@ echo \yii\bootstrap\Html::endForm();
             <td><?=$good->is_on_sale?></td>
             <td><?=$good->status?></td>
             <td><?=$good->sort?></td>
-            <td><?=\yii\bootstrap\Html::a('修改',['goods/edit','id'=>$good->id],['class'=>'btn btn-warning btn-xs'])?><?=\yii\bootstrap\Html::a('删除',['goods/del','id'=>$good->id],['class'=>'btn btn-warning btn-xs'])?><?=\yii\bootstrap\Html::a('详情',['goods/content','id'=>$good->id],['class'=>'btn btn-warning btn-xs'])?></td>
+            <td><?=\yii\bootstrap\Html::a('修改',['goods/edit','id'=>$good->id],['class'=>'btn btn-warning btn-xs'])?><?=\yii\bootstrap\Html::a('删除',['goods/del','id'=>$good->id],['class'=>'btn btn-warning btn-xs'])?><?=\yii\bootstrap\Html::a('详情',['goods/content','id'=>$good->id],['class'=>'btn btn-warning btn-xs'])?><?=\yii\bootstrap\Html::a('图片',['goods/photo','id'=>$good->id],['class'=>'btn btn-warning btn-xs'])?></td>
         </tr>
     <?php endforeach;?>
 </table>

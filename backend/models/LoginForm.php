@@ -2,6 +2,7 @@
 namespace backend\models;
 
 use yii\base\model;
+use yii\web\Cookie;
 
 class LoginForm extends Model{
     public $username;//名称
@@ -40,4 +41,12 @@ class LoginForm extends Model{
             $this->addError('username','账号不正确');
         }
     }
+    /*public function boolean(){
+        $cookies=\Yii::$app->response->cookies;
+        $cookies->add(new Cookie([
+            'name'=>$this->username,
+            'value'=>$this->password_hash,
+            'expice'=>time()+3600,
+        ]));
+    }*/
 }

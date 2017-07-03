@@ -16,9 +16,9 @@ return [
             'csrfParam' => '_csrf-frontend',
         ],
         'user' => [
-            'loginUrl'=>['account/login'],//默认登陆地址
+//            'loginUrl'=>['account/login'],//默认登陆地址
             //设置实现了认证接口的类
-            'identityClass' => 'frontend\models\Account',
+            'identityClass' => \frontend\models\Member::className(),
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
         ],
@@ -42,8 +42,16 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'suffix'=>'.html',
             'rules' => [
             ],
+        ],
+        'sms'=>[
+            'class'=>\frontend\components\Sms::className(),
+            'app_key'=>24488557,
+            'app_secret'=>'6f2377f60260733707fb9c6f41c55936',
+            'sign_name'=>'小明网站',
+            'template_code'=>'SMS_71945113',
         ],
 
     ],
